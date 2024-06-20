@@ -15,86 +15,98 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-import geopandas as gpd
-import pandas as pd
-import plotly.express as px
-import random
-
-# Read the shapefile using geopandas
-shapefile_path = 'gadm41_NLD_shp/gadm41_NLD_1.shp'
-data = gpd.read_file(shapefile_path)
-
-# Sample data for demonstration
-sample_data = {
-    'Province': ['Drenthe', 'Flevoland', 'Fryslân', 'Gelderland', 'Groningen', 'Limburg', 'Noord-Brabant', 'Noord-Holland', 'Overijssel', 'Utrecht', 'Zeeland', 'NA'],
-    'average_income': [random.randint(0, 1000000) for _ in range(12)]
-}
-
-# Merge the sample data with the shapefile data
-merged_data = data.merge(pd.DataFrame(sample_data), left_on='NAME_1', right_on='Province')
-
-# Exclude Zeeuwse meren and IJsselmeer regions
-merged_data = merged_data[~merged_data['NAME_1'].isin(['Zeeuwse meren', 'IJsselmeer'])]
-
-# Rename Fryslân to Friesland
-merged_data.loc[merged_data['NAME_1'] == 'Fryslân', 'NAME_1'] = 'Friesland'
-
-# Rename Noord-Brabant to Brabant
-merged_data.loc[merged_data['NAME_1'] == 'Noord-Brabant', 'NAME_1'] = 'Brabant'
-
-# Rename NA to Zuid-Holland
-merged_data.loc[merged_data['NAME_1'] == 'NA', 'NAME_1'] = 'Zuid-Holland'
-
-# Create the choropleth map using Plotly Express
-fig6 = px.choropleth_mapbox(
-    merged_data,
-    geojson=merged_data.geometry.__geo_interface__,
-    color='average_income',
-    locations=merged_data.index,
-    featureidkey="id",
-    center={"lat": 52.1326, "lon": 5.2913},
-    mapbox_style="carto-positron",
-    zoom=5.5,
-    color_continuous_scale='Blues',
-    labels={'average_income': 'Average income'},
-    opacity=0.75,
-    hover_name='NAME_1',  # Update to 'NAME_1' for correct hover labels
-    hover_data={'average_income': True, 'NAME_1': False},  # Update to 'NAME_1' for correct hover data
-    custom_data=['average_income'],
+trace_green = go.Bar(
+    x=merged_df['Country'],
+    y=merged_df['OBS_VALUE'],
+    name='Groen aandeel van land',
+    marker=dict(color='rgb(102,194,165)')
 )
 
-fig6.update_traces(
-    hovertemplate='<b>%{hovertext}</b><br>Average income: <b>%{customdata[0]}k</b><extra></extra>',
+trace_no = go.Bar(
+    x=merged_df['Country'],
+    y=merged_df['NO'],
+    name='Percentage mensen zonder stress klachten',
+    marker=dict(color='rgb(252,141,98)')
 )
 
-fig6.update_layout(
-    title_text='Average income by Province in the Netherlands',
-    margin={"r": 30, "t": 70, "l": 30, "b": 30},
-    legend=dict(
-        traceorder='normal',
-        font=dict(size=10),
-        bgcolor='rgba(255, 255, 255, 0.5)',
-        bordercolor='rgba(0, 0, 0, 0.5)',
-        borderwidth=0.5
+layout = go.Layout(
+    title='Figuur 3: Groen aandeel en percentage mensen zonder stress per land',
+    xaxis=go.layout.XAxis(
+        title='Land',
+        type='category'
     ),
-    hoverlabel=dict(
-        bgcolor='white',
-        font_size=12,
-        font_family='Arial',
+    yaxis=go.layout.YAxis(
+        title='Percentage',
     ),
-    height=600
+    barmode='group',
+    height=400
 )
 
-fig6.show()
+fig = go.Figure(data=[trace_green, trace_no], layout=layout)
+
+fig.show()
 ------------------
 
 
 [1;31m---------------------------------------------------------------------------[0m
-[1;31mModuleNotFoundError[0m                       Traceback (most recent call last)
-Cell [1;32mIn[7], line 1[0m
-[1;32m----> 1[0m [38;5;28;01mimport[39;00m [38;5;21;01mgeopandas[39;00m [38;5;28;01mas[39;00m [38;5;21;01mgpd[39;00m
-[0;32m      2[0m [38;5;28;01mimport[39;00m [38;5;21;01mpandas[39;00m [38;5;28;01mas[39;00m [38;5;21;01mpd[39;00m
-[0;32m      3[0m [38;5;28;01mimport[39;00m [38;5;21;01mplotly[39;00m[38;5;21;01m.[39;00m[38;5;21;01mexpress[39;00m [38;5;28;01mas[39;00m [38;5;21;01mpx[39;00m
+[1;31mKeyError[0m                                  Traceback (most recent call last)
+File [1;32m~\.conda\envs\jupyterbook\lib\site-packages\pandas\core\indexes\base.py:3805[0m, in [0;36mIndex.get_loc[1;34m(self, key)[0m
+[0;32m   3804[0m [38;5;28;01mtry[39;00m:
+[1;32m-> 3805[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_engine[49m[38;5;241;43m.[39;49m[43mget_loc[49m[43m([49m[43mcasted_key[49m[43m)[49m
+[0;32m   3806[0m [38;5;28;01mexcept[39;00m [38;5;167;01mKeyError[39;00m [38;5;28;01mas[39;00m err:
 
-[1;31mModuleNotFoundError[0m: No module named 'geopandas'
+File [1;32mindex.pyx:167[0m, in [0;36mpandas._libs.index.IndexEngine.get_loc[1;34m()[0m
+
+File [1;32mindex.pyx:196[0m, in [0;36mpandas._libs.index.IndexEngine.get_loc[1;34m()[0m
+
+File [1;32mpandas\\_libs\\hashtable_class_helper.pxi:7081[0m, in [0;36mpandas._libs.hashtable.PyObjectHashTable.get_item[1;34m()[0m
+
+File [1;32mpandas\\_libs\\hashtable_class_helper.pxi:7089[0m, in [0;36mpandas._libs.hashtable.PyObjectHashTable.get_item[1;34m()[0m
+
+[1;31mKeyError[0m: 'OBS_VALUE'
+
+The above exception was the direct cause of the following exception:
+
+[1;31mKeyError[0m                                  Traceback (most recent call last)
+Cell [1;32mIn[6], line 3[0m
+[0;32m      1[0m trace_green [38;5;241m=[39m go[38;5;241m.[39mBar(
+[0;32m      2[0m     x[38;5;241m=[39mmerged_df[[38;5;124m'[39m[38;5;124mCountry[39m[38;5;124m'[39m],
+[1;32m----> 3[0m     y[38;5;241m=[39m[43mmerged_df[49m[43m[[49m[38;5;124;43m'[39;49m[38;5;124;43mOBS_VALUE[39;49m[38;5;124;43m'[39;49m[43m][49m,
+[0;32m      4[0m     name[38;5;241m=[39m[38;5;124m'[39m[38;5;124mGroen aandeel van land[39m[38;5;124m'[39m,
+[0;32m      5[0m     marker[38;5;241m=[39m[38;5;28mdict[39m(color[38;5;241m=[39m[38;5;124m'[39m[38;5;124mrgb(102,194,165)[39m[38;5;124m'[39m)
+[0;32m      6[0m )
+[0;32m      8[0m trace_no [38;5;241m=[39m go[38;5;241m.[39mBar(
+[0;32m      9[0m     x[38;5;241m=[39mmerged_df[[38;5;124m'[39m[38;5;124mCountry[39m[38;5;124m'[39m],
+[0;32m     10[0m     y[38;5;241m=[39mmerged_df[[38;5;124m'[39m[38;5;124mNO[39m[38;5;124m'[39m],
+[0;32m     11[0m     name[38;5;241m=[39m[38;5;124m'[39m[38;5;124mPercentage mensen zonder stress klachten[39m[38;5;124m'[39m,
+[0;32m     12[0m     marker[38;5;241m=[39m[38;5;28mdict[39m(color[38;5;241m=[39m[38;5;124m'[39m[38;5;124mrgb(252,141,98)[39m[38;5;124m'[39m)
+[0;32m     13[0m )
+[0;32m     15[0m layout [38;5;241m=[39m go[38;5;241m.[39mLayout(
+[0;32m     16[0m     title[38;5;241m=[39m[38;5;124m'[39m[38;5;124mFiguur 3: Groen aandeel en percentage mensen zonder stress per land[39m[38;5;124m'[39m,
+[0;32m     17[0m     xaxis[38;5;241m=[39mgo[38;5;241m.[39mlayout[38;5;241m.[39mXAxis(
+[1;32m   (...)[0m
+[0;32m     25[0m     height[38;5;241m=[39m[38;5;241m400[39m
+[0;32m     26[0m )
+
+File [1;32m~\.conda\envs\jupyterbook\lib\site-packages\pandas\core\frame.py:4102[0m, in [0;36mDataFrame.__getitem__[1;34m(self, key)[0m
+[0;32m   4100[0m [38;5;28;01mif[39;00m [38;5;28mself[39m[38;5;241m.[39mcolumns[38;5;241m.[39mnlevels [38;5;241m>[39m [38;5;241m1[39m:
+[0;32m   4101[0m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m[38;5;241m.[39m_getitem_multilevel(key)
+[1;32m-> 4102[0m indexer [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mcolumns[49m[38;5;241;43m.[39;49m[43mget_loc[49m[43m([49m[43mkey[49m[43m)[49m
+[0;32m   4103[0m [38;5;28;01mif[39;00m is_integer(indexer):
+[0;32m   4104[0m     indexer [38;5;241m=[39m [indexer]
+
+File [1;32m~\.conda\envs\jupyterbook\lib\site-packages\pandas\core\indexes\base.py:3812[0m, in [0;36mIndex.get_loc[1;34m(self, key)[0m
+[0;32m   3807[0m     [38;5;28;01mif[39;00m [38;5;28misinstance[39m(casted_key, [38;5;28mslice[39m) [38;5;129;01mor[39;00m (
+[0;32m   3808[0m         [38;5;28misinstance[39m(casted_key, abc[38;5;241m.[39mIterable)
+[0;32m   3809[0m         [38;5;129;01mand[39;00m [38;5;28many[39m([38;5;28misinstance[39m(x, [38;5;28mslice[39m) [38;5;28;01mfor[39;00m x [38;5;129;01min[39;00m casted_key)
+[0;32m   3810[0m     ):
+[0;32m   3811[0m         [38;5;28;01mraise[39;00m InvalidIndexError(key)
+[1;32m-> 3812[0m     [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(key) [38;5;28;01mfrom[39;00m [38;5;21;01merr[39;00m
+[0;32m   3813[0m [38;5;28;01mexcept[39;00m [38;5;167;01mTypeError[39;00m:
+[0;32m   3814[0m     [38;5;66;03m# If we have a listlike key, _check_indexing_error will raise[39;00m
+[0;32m   3815[0m     [38;5;66;03m#  InvalidIndexError. Otherwise we fall through and re-raise[39;00m
+[0;32m   3816[0m     [38;5;66;03m#  the TypeError.[39;00m
+[0;32m   3817[0m     [38;5;28mself[39m[38;5;241m.[39m_check_indexing_error(key)
+
+[1;31mKeyError[0m: 'OBS_VALUE'
 
