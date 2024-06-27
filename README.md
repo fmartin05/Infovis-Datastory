@@ -1,5 +1,4 @@
-# data-story-example
+# Infovis Datastory
 
-This repository hosts an example that shows the format of the data story for the information visualization course at the Informatics Institute, University of Amsterdam.
+De titel van deze data story is "Het verband tussen stress en een groene omgeving".
 
-Credit: the format example is originally created by [Roan van Blanken](https://github.com/roanvanblanken) and later edited by [Yen-Chia Hsu](https://github.com/yenchiah).
